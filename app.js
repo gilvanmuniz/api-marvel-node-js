@@ -1,9 +1,11 @@
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const bodyParser = require('body-parser');
 
-const CharDataWrapper = require('./routes/CharDataWrapper-route');
+//const charDataWrapper = require('./routes/charDataWrapper-route');
+//const charDataCont = require('./routes/charDataCont-route');
+const characteres = require('./routes/characteres-route');
 
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -30,7 +32,9 @@ app.use((req, res, next) => {
 
 
 //routes:
-app.use('/characters', CharDataWrapper);
+//app.use('/characters', charDataWrapper);
+//app.use('/characters/cont', charDataCont);
+app.use('/characters', characteres);
 
 // Quando não encontra rota, entra aqui:
 app.use((req, res, next) => {

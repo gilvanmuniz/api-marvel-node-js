@@ -1,0 +1,10 @@
+{
+    "env" : {
+        "MYSQL_USER" : "root",
+        "MYSQL_PASSWORD" : "gr007879",
+        "MYSQL_DATABASE" : "heroes",
+        "MYSQL_HOST" : "localhost",
+        "MYSQL_PORT" : 3306,       
+        "URL_API" : "http://localhost:3000/"
+    }
+}
