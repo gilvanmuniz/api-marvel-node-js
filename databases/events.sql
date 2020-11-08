@@ -10,7 +10,11 @@ CREATE TABLE `comic` (
     `events_id` bigint,
     FOREIGN KEY (`events_id`) REFERENCES caractere (`heroes_id`)   
 );
-    
+
+INSERT INTO `heroes`.`event` (
+    `id`, `title`, `description`, `resourceURI`, `modified`, `start`, `end`, `events_id`) 
+VALUES (
+    '269', 'Secret Invasion', 'The shape-shifting Skrulls have been ', 'http://gateway.marvel.com/v1/public/events/269', '1988-11-01', '1988-07-01', '2019-11-01', '1011334');
 /*
 urls (Array[Url], optional): A set of public web site URLs for the event.,
 

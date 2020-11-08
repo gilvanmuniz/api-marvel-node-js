@@ -5,9 +5,7 @@ CREATE TABLE `story` (
     `description` varchar(250),
     `resourceURI` varchar(150),
     `type` varchar(150),
-    `modified` Date,
-    `start` Date,
-    `end` Date,
+    `modified` Date,    
     `stories_id` bigint,
     FOREIGN KEY (`stories_id`) REFERENCES caractere (`heroes_id`)   
 );
