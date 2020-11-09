@@ -574,8 +574,6 @@ router.get('/:id/stories', (req, res, next) => {
 
 });
 
-
-
 router.post('/', (req, res, next) => {
     mysql.getConnection((error, conn) => {
         conn.query(
@@ -590,10 +588,10 @@ router.post('/', (req, res, next) => {
     })
 });
 
-router.post('/', (req, res, next) => {
+router.post('/series', (req, res, next) => {
     mysql.getConnection((error, conn) => {
         conn.query(
-            'INSERT INTO caractere (heroes_id, name, description, modified, resourceuri) VALUES (?,?,?,?,?)',
+            'INSERT INTO series () VALUES (?,?,?,?,?)',
             [req.body.heroe_id, req.body.name, req.body.description, req.body.modified, req.body.resourceuri],
             async (error, result, field) => {
                 conn.release();
