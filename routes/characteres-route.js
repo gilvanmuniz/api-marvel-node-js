@@ -7,21 +7,25 @@ router.get('/', (req, res, next) => {
         coon.query(
             `SELECT *                       
             FROM caractere             
-            INNER JOIN images ON (caractere.img_id = images.id)
-            INNER JOIN eventolista ON (caractere.event_id = eventolista.id)
-            INNER JOIN comiclist ON (caractere.comic_id = comiclist.id)            
-            INNER JOIN storylist ON (caractere.storiy_id = storylist.id)
-            INNER JOIN url ON (caractere.url_id = url.id) `,
-            (error, result, field) => {
+                RIGHT JOIN images ON (caractere.img_id = images.id)
+                RIGHT JOIN eventolista ON (caractere.event_id = eventolista.id)
+                INNER JOIN serieslist ON (caractere.heroes_id = serieslist.caractere_id) 
+                INNER JOIN seriesumaries ON (serieslist.id = seriesumaries.Id_list)                
+                RIGHT JOIN comiclist ON (caractere.heroes_id = comiclist.caractere_id)            
+                RIGHT JOIN comicsumaries ON (comiclist.id = comicsumaries.comiclist_id)            
+                RIGHT JOIN storylist ON (caractere.storiy_id = storylist.id)
+                RIGHT JOIN storysumaries ON (storylist.story_sumary_id = storysumaries.id)
+                RIGHT JOIN url ON (caractere.url_id = url.id)`,
+                async (error, result, field) => {
                 if (error) {
                     return res.status(500).send({
                         error: error,
                         response: null
                     });
                 }
-                console.log(result)
-                const tamando = result.length;
-                const response = result.map(resultado => {
+                
+                const tamando = await result.length;
+                const response = await result.map(resultado => {
                     return {
                         code: 200,
                         status: "ok",
@@ -40,6 +44,7 @@ router.get('/', (req, res, next) => {
                                     name: resultado.name,
                                     description: resultado.description,
                                     modified: resultado.modified,
+                                    resourceuri:resultado.resourceuri,
                                     thumbnail: {
                                         path: resultado.path,
                                         extension: resultado.extension
@@ -50,14 +55,37 @@ router.get('/', (req, res, next) => {
                                         returned: resultado.returned_event
                                     },
                                     serie: {
-                                        available: resultado.available,
-                                        collectionuri: resultado.collectionuri,
-                                        returned: resultado.returned
+                                        available: resultado.available_serie,
+                                        collectionuri: resultado.collectionuri_serie,
+                                        returned: resultado.returne_serie,
+                                        items: [
+                                            {
+                                                resourceURI: resultado.resourceuri_serie,
+                                                name: resultado.name_serie,
+                                                type: "cover"
+                                            }
+                                        ]
                                     },
                                     comics: {
                                         available: resultado.available_comic,
                                         collectionuri: resultado.collectionuri_comic,
-                                        returned: resultado.returned_comic
+                                        returned: resultado.returned_comic,
+                                        items:{
+                                            resourceURI: resultado.resourceuri_comic,
+                                            name: resultado.name_comic,                                                 
+                                        }
+                                    },
+                                    stories: {
+                                        available: resultado.available_story,
+                                        collectionuri: resultado.collectionuri_story,
+                                        returned: resultado.returned_story,
+                                        items: [
+                                            {
+                                                resourceURI: resultado.resourceuri_story,
+                                                name: resultado.namestory,
+                                                type: "cover"
+                                            }
+                                        ]
                                     },
                                     urls: {
                                         type: resultado.type,
@@ -71,7 +99,6 @@ router.get('/', (req, res, next) => {
 
                     }
                 })
-
                 res.status(201).send({
                     mensagem: 'retorno positivo',
                     response
@@ -83,7 +110,6 @@ router.get('/', (req, res, next) => {
 
 router.get('/:id', (req, res, next) => {
     mysql.getConnection((error, conn) => {
-
         conn.query(
             `SELECT *                       
             FROM caractere             
@@ -92,6 +118,7 @@ router.get('/:id', (req, res, next) => {
                 INNER JOIN serieslist ON (caractere.heroes_id = serieslist.caractere_id) 
                 INNER JOIN seriesumaries ON (serieslist.id = seriesumaries.Id_list)                
                 RIGHT JOIN comiclist ON (caractere.comic_id = comiclist.id)            
+                RIGHT JOIN comicsumaries ON (comiclist.id = comicsumaries.comiclist_id)            
                 RIGHT JOIN storylist ON (caractere.storiy_id = storylist.id)
                 RIGHT JOIN storysumaries ON (storylist.story_sumary_id = storysumaries.id)
                 RIGHT JOIN url ON (caractere.url_id = url.id)    
@@ -104,10 +131,7 @@ router.get('/:id', (req, res, next) => {
                         response: null
                     });
                 }
-                const teste = await result;
-                teste.forEach(element => {
-                    console.log(element.name_serie);
-                });
+                
                 const tamando = await result.length;
                 const response = await result.map(resultado => {
 
@@ -124,10 +148,11 @@ router.get('/:id', (req, res, next) => {
                             total: 1493,
                             count: tamando,
                             results: [
-                                {
+                                   {
                                     id: resultado.heroes_id,
                                     name: resultado.name,
                                     description: resultado.description,
+                                    resourceuri:resultado.resourceuri,
                                     modified: resultado.modified,
                                     thumbnail: {
                                         path: resultado.path,
@@ -153,7 +178,11 @@ router.get('/:id', (req, res, next) => {
                                     comics: {
                                         available: resultado.available_comic,
                                         collectionuri: resultado.collectionuri_comic,
-                                        returned: resultado.returned_comic
+                                        returned: resultado.returned_comic,
+                                        items:{
+                                            resourceURI: resultado.resourceuri_comic,
+                                            name: resultado.name_comic,                                                 
+                                        }
                                     },
                                     stories: {
                                         available: resultado.available_story,
@@ -196,16 +225,18 @@ router.get('/:id/comics', (req, res, next) => {
             FROM comic INNER JOIN caractere
             RIGHT JOIN eventolista ON (caractere.event_id = eventolista.id)
             RIGHT JOIN serieslist ON (caractere.heroes_id = serieslist.caractere_id) 
-            RIGHT JOIN seriesumaries ON (serieslist.id = seriesumaries.Id_list) 
+            RIGHT JOIN seriesumaries ON (serieslist.id = seriesumaries.Id_list)
+            RIGHT JOIN comiclist ON (caractere.comic_id = comiclist.id)            
+            RIGHT JOIN comicsumaries ON (comiclist.id = comicsumaries.comiclist_id) 
             RIGHT JOIN images ON (caractere.img_id = images.id) 
             RIGHT JOIN eventsumaries ON (eventolista.id = eventsumaries.eventlist_id) 
             WHERE comic.comics_id = ? 
             `,
 
             [req.params.id],
-            (error, result, field) => {
+            async(error, result, field) => {
                 if (error) {
-                    return res.status(500).send({
+                    return await res.status(500).send({
                         error: error,
                         response: null
                     });
@@ -258,8 +289,8 @@ router.get('/:id/comics', (req, res, next) => {
                                         type: "cover"
                                     },
                                     ComicSummary: {
-                                        resourceURI: "",
-                                        name: "",
+                                        resourceURI: resultado.resourceuri_comic,
+                                        name: resultado.name_comic,
                                     },
                                     ComicDate: {
                                         type: "",
@@ -312,20 +343,20 @@ router.get('/:id/events', (req, res, next) => {
     console.log(req.params.id)
     mysql.getConnection((error, coon) => {
         coon.query(
-            `SELECT *                       
+            `SELECT *                      
             FROM event  WHERE event.events_id = ? 
             `,
 
             [req.params.id],
-            (error, result, field) => {
+            async (error, result, field) => {
                 if (error) {
                     return res.status(500).send({
                         error: error,
                         response: null
                     });
                 }
-                const tamando = result.length;
-                const response = result.map(resultado => {
+                const tamando = await result.length;
+                const response = await result.map(resultado => {
                     return {
                         code: 200,
                         status: "ok",
@@ -546,15 +577,52 @@ router.get('/:id/stories', (req, res, next) => {
 
 
 router.post('/', (req, res, next) => {
-    conn.query(
-        'INSERT INTO caractere (Id, name) VALUES (?,?)',
-        [req.body.productId, req.body.quantity],
-        (error, result, field) => {
-            conn.release();
-            if (error) { return res.status(500).send({ error: error }) }
-            return res.status(201).send(result);
-        }
-    )
+    mysql.getConnection((error, conn) => {
+        conn.query(
+            'INSERT INTO caractere (heroes_id, name, description, modified, resourceuri) VALUES (?,?,?,?,?)',
+            [req.body.heroe_id, req.body.name, req.body.description, req.body.modified, req.body.resourceuri],
+            async (error, result, field) => {
+                conn.release();
+                if (error) { return await res.status(500).send({ error: error }) }
+                return await res.status(201).send(result);
+            }
+        )
+    })
 });
+
+
+router.put('/:id', (req, res, next) => {
+    mysql.getConnection((error, conn) => {
+        conn.query(
+            `UPDATE caractere 
+                SET name = ?,
+                    description = ?, 
+                    modified = ?, 
+                    resourceuri = ? 
+                    WHERE heroes_id = ?`,
+                    [req.body.name, req.body.description, req.body.modified, req.body.resourceuri, req.params.id],
+            (error, result, field) => {
+                conn.release();
+                if (error) { return res.status(500).send({ error: error }) }
+                return res.status(201).send(result);
+            }
+        )
+    });
+});
+
+router.delete('/:id', (req, res, next) => {
+    mysql.getConnection((error, conn) => {
+        conn.query(
+            `DELETE FROM caractere WHERE heroes_id = ?`,
+            [req.params.productId],
+            (error, result, field) => {
+                conn.release();
+                if (error) { return res.status(500).send({ error: error }) }
+                return res.status(201).send(result);
+            }
+        )
+    }); 
+});
+
 
 module.exports = router;

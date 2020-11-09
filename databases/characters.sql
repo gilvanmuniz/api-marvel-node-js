@@ -179,7 +179,6 @@ LOCK TABLES `conteudo` WRITE;
 /*!40000 ALTER TABLE `conteudo` DISABLE KEYS */;
 /*!40000 ALTER TABLE `conteudo` ENABLE KEYS */;
 UNLOCK TABLES;
-
 --
 -- Table structure for table `event`
 --
@@ -540,3 +539,32 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2020-11-09  8:52:29
+
+/* FOREIGN KEY de COMICSSUMARIES PARA COMICLIST  */
+ALTER TABLE `heroes`.`comicsumaries` 
+ADD CONSTRAINT `fk_comicsumaries_2`
+  FOREIGN KEY (`comiclist_id`)
+  REFERENCES `heroes`.`comiclist` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+UPDATE `heroes`.`comicsumaries` SET `comiclist_id` = '1' WHERE (`id` = '1');
+
+ALTER TABLE `heroes`.`comicsumaries` 
+CHANGE COLUMN `name` `name_comic` VARCHAR(255) NULL DEFAULT NULL ,
+CHANGE COLUMN `resourceuri` `resourceuri_comic` VARCHAR(255) NULL DEFAULT NULL ;
+
+
+/* Melhorando relacionamento entre comiclist e caractere */
+ALTER TABLE `heroes`.`comiclist` 
+ADD COLUMN `caractere_id` BIGINT NULL AFTER `comic_sumary_id`,
+ADD INDEX `fk_comiclist_1_idx` (`caractere_id` ASC) VISIBLE;
+;
+ALTER TABLE `heroes`.`comiclist` 
+ADD CONSTRAINT `fk_comiclist_1`
+  FOREIGN KEY (`caractere_id`)
+  REFERENCES `heroes`.`caractere` (`heroes_id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+  UPDATE `heroes`.`comiclist` SET `caractere_id` = '1011334' WHERE (`id` = '1');
