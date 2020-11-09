@@ -543,6 +543,10 @@ UNLOCK TABLES;
 -- Dump completed on 2020-11-09  8:52:29
 
 /* FOREIGN KEY de COMICSSUMARIES PARA COMICLIST  */
+ALTER TABLE `apimarvel`.`comiclist` 
+ADD COLUMN `comiclist_id` BIGINT NULL AFTER `comic_sumary_id`;
+
+
 ALTER TABLE `heroes`.`comicsumaries` 
 ADD CONSTRAINT `fk_comicsumaries_2`
   FOREIGN KEY (`comiclist_id`)
