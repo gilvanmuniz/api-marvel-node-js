@@ -3,18 +3,13 @@ const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 
-//const charDataWrapper = require('./routes/charDataWrapper-route');
-//const charDataCont = require('./routes/charDataCont-route');
+
 const characteres = require('./routes/characteres-route');
 
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-// app.use('/marvel', (req, res, next) => {
-//     res.status(200).send({
-//         message:"Api Rest Marvel"
-//     })
-// })
+
 
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
@@ -32,8 +27,6 @@ app.use((req, res, next) => {
 
 
 //routes:
-//app.use('/characters', charDataWrapper);
-//app.use('/characters/cont', charDataCont);
 app.use('/characters', characteres);
 
 // Quando não encontra rota, entra aqui:
