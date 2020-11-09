@@ -17,7 +17,9 @@
 
 --
 -- Table structure for table `caractere`
---
+
+CREATE DATABASE heroes;--
+
 
 DROP TABLE IF EXISTS `caractere`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
